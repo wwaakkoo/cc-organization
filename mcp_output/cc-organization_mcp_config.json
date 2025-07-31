@@ -1,0 +1,219 @@
+{
+  "mcpServers": {
+    "cc-organization-repo": {
+      "command": "python",
+      "args": [
+        "-m",
+        "mcp_repo_server",
+        "/home/hi_ry/cc-organization"
+      ],
+      "env": {
+        "REPO_PATH": "/home/hi_ry/cc-organization",
+        "REPO_NAME": "cc-organization"
+      }
+    }
+  },
+  "_metadata": {
+    "repo_name": "cc-organization",
+    "repo_path": "/home/hi_ry/cc-organization",
+    "project_type": "general",
+    "languages": {
+      "markdown": 9,
+      "shell": 5,
+      "text": 1,
+      "python": 2,
+      "config": 1
+    },
+    "important_files": [
+      "mcp_output/cc-organization_mcp_server.py",
+      ".tmux.conf",
+      "README-en.md",
+      "ARCHITECTURE.md",
+      "README.md",
+      "CLAUDE.md",
+      "setup.sh",
+      "LICENSE",
+      "repo_mcp_generator.py",
+      "MCP_USAGE_GUIDE.md",
+      "run_mcp_generator.sh",
+      "agent-send.sh",
+      "mcp_output/cc-organization_usage.md",
+      "scripts/monitor.sh",
+      "scripts/quick-setup.sh",
+      "instructions/worker.md",
+      "instructions/boss.md",
+      "instructions/president.md"
+    ],
+    "tools": [
+      {
+        "name": "read_file",
+        "description": "Read any file from the cc-organization repository",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "path": {
+              "type": "string",
+              "description": "File path relative to repository root"
+            }
+          },
+          "required": [
+            "path"
+          ]
+        }
+      },
+      {
+        "name": "search_files",
+        "description": "Search for files in the cc-organization repository by pattern",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "pattern": {
+              "type": "string",
+              "description": "File name pattern (supports wildcards)"
+            },
+            "language": {
+              "type": "string",
+              "description": "Filter by programming language"
+            }
+          },
+          "required": [
+            "pattern"
+          ]
+        }
+      },
+      {
+        "name": "search_code",
+        "description": "Search for code patterns in the cc-organization repository",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "query": {
+              "type": "string",
+              "description": "Code pattern to search for"
+            },
+            "file_type": {
+              "type": "string",
+              "description": "File extension to limit search to"
+            }
+          },
+          "required": [
+            "query"
+          ]
+        }
+      },
+      {
+        "name": "analyze_python",
+        "description": "Analyze Python code structure and dependencies",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "file_path": {
+              "type": "string",
+              "description": "Python file to analyze"
+            }
+          },
+          "required": [
+            "file_path"
+          ]
+        }
+      }
+    ],
+    "resources": [
+      {
+        "uri": "file://mcp_output/cc-organization_mcp_server.py",
+        "name": "cc-organization/mcp_output/cc-organization_mcp_server.py",
+        "description": "Python file - 8 functions, 0 classes",
+        "mimeType": "text/x-python"
+      },
+      {
+        "uri": "file://.tmux.conf",
+        "name": "cc-organization/.tmux.conf",
+        "description": "Config file - 0 functions, 0 classes",
+        "mimeType": "text/plain"
+      },
+      {
+        "uri": "file://README-en.md",
+        "name": "cc-organization/README-en.md",
+        "description": "Markdown file - 0 functions, 0 classes",
+        "mimeType": "text/markdown"
+      },
+      {
+        "uri": "file://ARCHITECTURE.md",
+        "name": "cc-organization/ARCHITECTURE.md",
+        "description": "Markdown file - 0 functions, 0 classes",
+        "mimeType": "text/markdown"
+      },
+      {
+        "uri": "file://README.md",
+        "name": "cc-organization/README.md",
+        "description": "Markdown file - 0 functions, 0 classes",
+        "mimeType": "text/markdown"
+      },
+      {
+        "uri": "file://CLAUDE.md",
+        "name": "cc-organization/CLAUDE.md",
+        "description": "Markdown file - 0 functions, 0 classes",
+        "mimeType": "text/markdown"
+      },
+      {
+        "uri": "file://setup.sh",
+        "name": "cc-organization/setup.sh",
+        "description": "Shell file - 0 functions, 0 classes",
+        "mimeType": "text/plain"
+      },
+      {
+        "uri": "file://LICENSE",
+        "name": "cc-organization/LICENSE",
+        "description": "Text file - 0 functions, 0 classes",
+        "mimeType": "text/plain"
+      },
+      {
+        "uri": "file://repo_mcp_generator.py",
+        "name": "cc-organization/repo_mcp_generator.py",
+        "description": "Python file - 26 functions, 5 classes",
+        "mimeType": "text/x-python"
+      },
+      {
+        "uri": "file://MCP_USAGE_GUIDE.md",
+        "name": "cc-organization/MCP_USAGE_GUIDE.md",
+        "description": "Markdown file - 0 functions, 0 classes",
+        "mimeType": "text/markdown"
+      },
+      {
+        "uri": "repo://cc-organization/overview",
+        "name": "cc-organization Overview",
+        "description": "Repository overview: 18 files, 5 languages",
+        "mimeType": "application/json"
+      }
+    ],
+    "prompts": [
+      {
+        "name": "explain_code",
+        "description": "Explain code from the cc-organization repository",
+        "arguments": [
+          {
+            "name": "file_path",
+            "description": "Path to the file to explain",
+            "required": true
+          },
+          {
+            "name": "detail_level",
+            "description": "Level of detail (basic, detailed, expert)",
+            "required": false
+          }
+        ]
+      },
+      {
+        "name": "analyze_architecture",
+        "description": "Analyze the architecture of the cc-organization project",
+        "arguments": [
+          {
+            "name": "focus_area",
+            "description": "Area to focus on (structure, dependencies, patterns)",
+            "required": false
+          }
+        ]
+      }
+    ]
+  }
+}
