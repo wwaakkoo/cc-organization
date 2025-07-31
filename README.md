@@ -1,165 +1,125 @@
-# 🤖 Tmux Multi-Agent Communication Demo
+# Multi-Agent Communication System
 
-Agent同士がやり取りするtmux環境のデモシステム
-
-**📖 Read this in other languages:** [English](README-en.md)
-
-## 🎯 デモ概要
-
-PRESIDENT → BOSS → Workers の階層型指示システムを体感できます
-
-### 👥 エージェント構成
-
-```
-📊 PRESIDENT セッション (1ペイン)
-└── PRESIDENT: プロジェクト統括責任者
-
-📊 multiagent セッション (4ペイン)  
-├── boss1: チームリーダー
-├── worker1: 実行担当者A
-├── worker2: 実行担当者B
-└── worker3: 実行担当者C
-```
+高度な協調作業を実現するマルチエージェント開発システム
 
 ## 🚀 クイックスタート
 
-### 0. リポジトリのクローン
-
+### 方法1: 自動セットアップ（推奨）
 ```bash
-git clone https://github.com/nishimoto265/Claude-Code-Communication.git
-cd Claude-Code-Communication
+# 環境セットアップ + 開発セッション開始
+./scripts/quick-setup.sh start
 ```
 
-### 1. tmux環境構築
-
-⚠️ **注意**: 既存の `multiagent` と `president` セッションがある場合は自動的に削除されます。
-
+### 方法2: 手動セットアップ
 ```bash
+# 1. 環境構築
 ./setup.sh
+
+# 2. Claude Code一括起動
+for i in {0..3}; do tmux send-keys -t multiagent:0.$i 'npx claude --dangerously-skip-permissions' C-m; done
+
+# 3. デモ実行
+# PRESIDENTに「あなたはpresidentです。指示書に従って」と入力
 ```
 
-### 2. セッションアタッチ
+## 🛠️ 開発支援ツール
 
 ```bash
-# マルチエージェント確認
-tmux attach-session -t multiagent
+# システム監視ダッシュボード
+./scripts/monitor.sh
 
-# プレジデント確認（別ターミナルで）
-tmux attach-session -t president
-```
+# 環境セットアップ
+./scripts/quick-setup.sh setup
 
-### 3. Claude Code起動
+# システム状態確認
+./scripts/quick-setup.sh status
 
-**手順1: President認証**
-```bash
-# まずPRESIDENTで認証を実施
-tmux send-keys -t president 'claude' C-m
-```
-認証プロンプトに従って許可を与えてください。
-
-**手順2: Multiagent一括起動**
-```bash
-# 認証完了後、multiagentセッションを一括起動
-for i in {0..3}; do tmux send-keys -t multiagent:0.$i 'claude' C-m; done
-```
-
-### 4. デモ実行
-
-PRESIDENTセッションで直接入力：
-```
-あなたはpresidentです。指示書に従って
-```
-
-## 📜 指示書について
-
-各エージェントの役割別指示書：
-- **PRESIDENT**: `instructions/president.md`
-- **boss1**: `instructions/boss.md` 
-- **worker1,2,3**: `instructions/worker.md`
-
-**Claude Code参照**: `CLAUDE.md` でシステム構造を確認
-
-**要点:**
-- **PRESIDENT**: 「あなたはpresidentです。指示書に従って」→ boss1に指示送信
-- **boss1**: PRESIDENT指示受信 → workers全員に指示 → 完了報告
-- **workers**: Hello World実行 → 完了ファイル作成 → 最後の人が報告
-
-## 🎬 期待される動作フロー
-
-```
-1. PRESIDENT → boss1: "あなたはboss1です。Hello World プロジェクト開始指示"
-2. boss1 → workers: "あなたはworker[1-3]です。Hello World 作業開始"  
-3. workers → ./tmp/ファイル作成 → 最後のworker → boss1: "全員作業完了しました"
-4. boss1 → PRESIDENT: "全員完了しました"
-```
-
-## 🔧 手動操作
-
-### agent-send.shを使った送信
-
-```bash
-# 基本送信
-./agent-send.sh [エージェント名] [メッセージ]
-
-# 例
-./agent-send.sh boss1 "緊急タスクです"
-./agent-send.sh worker1 "作業完了しました"
-./agent-send.sh president "最終報告です"
+# システム全体リセット
+./scripts/quick-setup.sh reset
 
 # エージェント一覧確認
 ./agent-send.sh --list
 ```
 
-## 🧪 確認・デバッグ
+## 📁 システム構成
 
-### ログ確認
-
-```bash
-# 送信ログ確認
-cat logs/send_log.txt
-
-# 特定エージェントのログ
-grep "boss1" logs/send_log.txt
-
-# 完了ファイル確認
-ls -la ./tmp/worker*_done.txt
+```
+cc-organization/
+├── instructions/      # エージェント指示書（高度化済み）
+│   ├── president.md   # プロジェクト統括・監視・エラーハンドリング
+│   ├── boss.md        # チーム管理・タスク分散・品質管理
+│   └── worker.md      # 作業実行・品質チェック・協調作業
+├── scripts/          # 開発支援ツール（新規追加）
+│   ├── monitor.sh     # システム監視ツール
+│   └── quick-setup.sh # クイック開発環境構築
+├── logs/             # 通信・作業ログ（拡張）
+├── tmp/              # 作業用一時ファイル
+├── results/          # 成果物・レポート
+├── dictionaries/     # 共通辞書・用語集
+├── agent-send.sh     # エージェント間通信（最適化済み）
+├── setup.sh          # 環境構築スクリプト
+├── .tmux.conf        # tmux最適化設定（新規追加）
+└── CLAUDE.md         # システム構成・使用方法（更新済み）
 ```
 
-### セッション状態確認
+## 🤖 エージェント構成
 
-```bash
-# セッション一覧
-tmux list-sessions
+- **PRESIDENT** (別セッション): プロジェクト統括責任者・プロジェクト管理・監視・エラーハンドリング
+- **boss1** (multiagent:agents): チームリーダー・タスク分散・品質管理・成果物統合
+- **worker1,2,3** (multiagent:agents): 実行担当・専門分野別処理・協調作業
 
-# ペイン一覧
-tmux list-panes -t multiagent
-tmux list-panes -t president
+## 🔄 基本フロー
+
+```
+PRESIDENT → boss1 → workers(1,2,3) → boss1 → PRESIDENT
+    ↓           ↓         ↓              ↓
+  計画・監視  タスク分散  実行・検証    統合・報告
 ```
 
-## 🔄 環境リセット
+## 📋 利用可能プロジェクトタイプ
 
-```bash
-# セッション削除
-tmux kill-session -t multiagent
-tmux kill-session -t president
+- **Hello World**: 基本動作確認・通信テスト
+- **データ処理**: ファイル処理・データ解析・変換
+- **API連携**: 外部API呼び出し・レスポンス処理
+- **テスト**: 自動テスト実行・結果集約・レポート生成
+- **Webアプリ**: フルスタック開発・統合テスト
 
-# 完了ファイル削除
-rm -f ./tmp/worker*_done.txt
+## 🆕 最新の改善点（v2.0）
 
-# 再構築（自動クリア付き）
-./setup.sh
-```
+### 指示書の高度化
+- エラーハンドリング・品質管理機能追加
+- プロジェクトタイプ別対応
+- 進捗監視・タイムアウト機能（5分）
+- 協調作業・成果物統合機能
+- **連携最小化原則**の明文化・実装
 
----
+### 通信システム最適化
+- 自動リトライ機能（最大3回）
+- 詳細ログ・エージェント別ログ
+- エラー検知・失敗時の適切な処理
 
-## 📄 ライセンス
+### 開発支援ツール追加
+- リアルタイムシステム監視
+- ワンコマンド環境構築
+- tmux最適化設定
+- システム全体リセット機能
 
-このプロジェクトは[MIT License](LICENSE)の下で公開されています。
+## 🎯 開発ベストプラクティス（連携最小化原則）
 
-## 🤝 コントリビューション
+### ✅ 推奨タスク分散パターン
+- **実装 ↔ テスト・検証**: 機能完成後にテスト実行
+- **開発 ↔ 統合・文書化**: 開発完了後に統合・ドキュメント作成
+- **順次実行**: 実装完了 → テスト → 統合・リリース準備
 
-プルリクエストやIssueでのコントリビューションを歓迎いたします！
+### ❌ 避けるべき分散パターン
+- **フロントエンド ↔ バックエンド**: API調整コストが大きい
+- **データベース ↔ アプリケーション**: データ構造調整で手戻り発生
+- **エンジン内部の分割**: 内部API調整で複雑化
+- **認証 ↔ 認可**: セキュリティ設計で密結合
 
----
+### Worker役割分担
+- **worker1**: コア実装担当（密結合部分も含めて一貫実装）
+- **worker2**: 品質保証担当（実装完了後のテスト・検証）
+- **worker3**: 統合・文書化担当（完成品の統合・リリース準備）
 
-🚀 **Agent Communication を体感してください！** 🤖✨ 
+システムは実装とテスト、フロントエンドとバックエンドを適切に分離し、連携部分を最小化するよう設計されています。詳細は各エージェントの指示書を参照してください。

@@ -97,34 +97,54 @@ show_agents() {
     fi
 }
 
-# ログ記録
+# ログ記録（拡張版）
 log_send() {
     local agent="$1"
     local message="$2"
     local timestamp=$(date '+%Y-%m-%d %H:%M:%S')
+    local status="${3:-SUCCESS}"
     
     mkdir -p logs
-    echo "[$timestamp] $agent: SENT - \"$message\"" >> logs/send_log.txt
+    echo "[$timestamp] $agent: $status - \"$message\"" >> logs/send_log.txt
+    
+    # エージェント別ログも作成
+    echo "[$timestamp] SENT: \"$message\"" >> logs/${agent}_log.txt
 }
 
-# メッセージ送信
+# メッセージ送信（拡張版）
 send_message() {
     local target="$1"
     local message="$2"
+    local retry_count=0
+    local max_retries=3
     
     echo "📤 送信中: $target ← '$message'"
     
-    # Claude Codeのプロンプトを一度クリア
-    tmux send-keys -t "$target" C-c
-    sleep 0.3
+    while [ $retry_count -lt $max_retries ]; do
+        # Claude Codeのプロンプトを一度クリア
+        tmux send-keys -t "$target" C-c
+        sleep 0.3
+        
+        # メッセージ送信
+        tmux send-keys -t "$target" "$message"
+        sleep 0.1
+        
+        # エンター押下
+        tmux send-keys -t "$target" C-m
+        sleep 0.5
+        
+        # 送信成功確認（基本的には成功とみなす）
+        if [ $? -eq 0 ]; then
+            return 0
+        fi
+        
+        retry_count=$((retry_count + 1))
+        echo "⚠️  送信失敗 (試行 $retry_count/$max_retries)"
+        sleep 1
+    done
     
-    # メッセージ送信
-    tmux send-keys -t "$target" "$message"
-    sleep 0.1
-    
-    # エンター押下
-    tmux send-keys -t "$target" C-m
-    sleep 0.5
+    echo "❌ 送信失敗: $target へのメッセージ送信に失敗しました"
+    return 1
 }
 
 # ターゲット存在確認
@@ -177,12 +197,16 @@ main() {
     fi
     
     # メッセージ送信
-    send_message "$target" "$message"
-    
-    # ログ記録
-    log_send "$agent_name" "$message"
-    
-    echo "✅ 送信完了: $agent_name に '$message'"
+    if send_message "$target" "$message"; then
+        # ログ記録（成功）
+        log_send "$agent_name" "$message" "SUCCESS"
+        echo "✅ 送信完了: $agent_name に '$message'"
+    else
+        # ログ記録（失敗）
+        log_send "$agent_name" "$message" "FAILED"
+        echo "❌ 送信失敗: $agent_name に '$message'"
+        exit 1
+    fi
     
     return 0
 }

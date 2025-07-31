@@ -1,19 +1,77 @@
-# Agent Communication System
+# Multi-Agent Communication System
+
+## システム概要
+高度な協調作業を実現するマルチエージェント開発システム
 
 ## エージェント構成
-- **PRESIDENT** (別セッション): 統括責任者
-- **boss1** (multiagent:agents): チームリーダー
-- **worker1,2,3** (multiagent:agents): 実行担当
+- **PRESIDENT** (別セッション): 統括責任者・プロジェクト管理
+- **boss1** (multiagent:agents): チームリーダー・タスク分散・品質管理
+- **worker1,2,3** (multiagent:agents): 実行担当・専門分野別処理
 
-## あなたの役割
-- **PRESIDENT**: @instructions/president.md
-- **boss1**: @instructions/boss.md
-- **worker1,2,3**: @instructions/worker.md
+## 役割別指示書
+- **PRESIDENT**: @instructions/president.md - プロジェクト統括・監視・エラーハンドリング
+- **boss1**: @instructions/boss.md - チーム管理・タスク分散・品質管理  
+- **worker1,2,3**: @instructions/worker.md - 作業実行・品質チェック・協調作業
 
-## メッセージ送信
+## 基本コマンド
+
+### エージェント通信
 ```bash
-./agent-send.sh [相手] "[メッセージ]"
+./agent-send.sh [エージェント名] "[メッセージ]"
+./agent-send.sh --list  # エージェント一覧確認
+```
+
+### 開発支援ツール
+```bash
+./scripts/quick-setup.sh setup    # 環境セットアップ
+./scripts/quick-setup.sh start    # 開発セッション開始
+./scripts/monitor.sh              # システム監視
 ```
 
 ## 基本フロー
-PRESIDENT → boss1 → workers → boss1 → PRESIDENT 
+```
+PRESIDENT → boss1 → workers(1,2,3) → boss1 → PRESIDENT
+    ↓           ↓         ↓              ↓
+  計画・監視  タスク分散  実行・検証    統合・報告
+```
+
+## 利用可能プロジェクトタイプ
+- **Hello World**: 基本動作確認・通信テスト
+- **データ処理**: ファイル処理・データ解析・変換
+- **API連携**: 外部API呼び出し・レスポンス処理
+- **テスト**: 自動テスト実行・結果集約・レポート生成
+
+## ディレクトリ構造
+```
+cc-organization/
+├── instructions/     # エージェント指示書
+├── scripts/         # 開発支援ツール
+├── logs/           # 通信・作業ログ
+├── tmp/            # 作業用一時ファイル
+├── results/        # 成果物・レポート
+└── dictionaries/   # 共通辞書・用語集
+```
+
+## エラーハンドリング
+- 自動リトライ機能（最大3回）
+- エージェント別エラー追跡
+- タイムアウト検知（5分）
+- 状態ファイルによる復旧支援
+
+## 🎯 タスク分散戦略（連携最小化原則）
+
+### ✅ 推奨分割パターン
+- **実装 ↔ テスト・検証**: worker1=完全実装, worker2=品質確認
+- **機能開発 ↔ 統合・文書化**: worker1=機能完成, worker3=統合・ドキュメント
+- **順次実行**: 実装完了 → テスト → 統合・リリース準備
+
+### ❌ 避けるべき分割パターン  
+- **フロントエンド ↔ バックエンド**: API調整コストが大きい
+- **データベース ↔ アプリケーション**: データ構造調整で手戻り発生
+- **エンジン内部の分割**: 内部API調整で複雑化
+- **認証 ↔ 認可**: セキュリティ設計で密結合
+
+### Worker役割分担
+- **worker1**: コア実装担当（密結合部分も含めて一貫実装）
+- **worker2**: 品質保証担当（実装完了後のテスト・検証）
+- **worker3**: 統合・文書化担当（完成品の統合・リリース準備） 
